@@ -1,0 +1,55 @@
+plugins {
+	id 'org.springframework.boot' version '2.6.3'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id 'com.diffplug.spotless' version '5.1.1'
+}
+
+group = 'com.boasaude'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+apply plugin: 'com.diffplug.spotless'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springdoc:springdoc-openapi-webflux-core:1.4.3'
+	implementation 'org.springdoc:springdoc-openapi-webflux-ui:1.4.3'
+	implementation 'org.glassfish.web:javax.el:2.2.6'
+	implementation 'javax.el:javax.el-api:3.0.0'
+	implementation 'org.hibernate:hibernate-validator:6.1.0.Final'
+	implementation 'org.apache.commons:commons-lang3:3.10'
+	implementation 'junit:junit:4.13.1'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.projectreactor:reactor-test'
+}
+
+test {
+	useJUnitPlatform()
+}
+
+spotless {
+	format 'misc', {
+		target '**/*.gradle', '**/*.md', '**/.gitignore', '**/*.yml', '**/*.yaml'
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	java {
+		importOrderFile 'spotless/spotless.importorder'
+		removeUnusedImports()
+		eclipse().configFile 'spotless/spotless.eclipse-fmt.xml'
+		custom 'Lambda fix', { it.replace('} )', '})').replace('} ,', '},') }
+	}
+}

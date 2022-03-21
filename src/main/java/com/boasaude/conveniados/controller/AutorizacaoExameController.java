@@ -1,0 +1,53 @@
+package com.boasaude.conveniados.controller;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import com.boasaude.conveniados.request.AutorizacaoExameRequest;
+import com.boasaude.conveniados.response.AutorizacaoExameResponse;
+import com.boasaude.conveniados.service.AutorizacaoExameService;
+
+import reactor.core.publisher.Mono;
+
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+@RequestMapping("/autorizacaoexame")
+@RequiredArgsConstructor
+@RestController
+public class AutorizacaoExameController {
+
+    private final AutorizacaoExameService autorizacaoExameService;
+
+    @PostMapping()
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Autorizado com sucesso", content = @Content(
+                    schema = @Schema(
+                            implementation = AutorizacaoExameResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Ocorreu um problema ao verificar autorização para realização do exame")
+    })
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<AutorizacaoExameResponse> autorizarExecucaoExame(@RequestBody AutorizacaoExameRequest autorizacaoExameRequest) {
+        return autorizacaoExameService.autorizarExecucaoExame(autorizacaoExameRequest);
+    }
+}
+
+// Autorização de exame - POST
+
+// parametros:
+//
+// - Numero Carteira
+// - Codigo procedimento
+//
+
+// Regra de negócio para autorização de exame/consulta:
+
+// - Buscar usuário
+// - Verificar se usuário é ativo (Ativo considera se está em dia com pagamentos)
+// - Buscar plano de saúde do usuário
+// - Verificar se plano de saúde contempla procedimento
+// - Verificar se usuário já cumpriu carência
