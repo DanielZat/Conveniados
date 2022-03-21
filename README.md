@@ -7,7 +7,6 @@ Microsserviço de conveniados criado para utilização na POC de arquitetura da 
 - Java - Linguagem de programação utilizada
 - Webflux - Módulo inserido no framework que possibilita aplicações web com Spring trabalhar de forma reativa
 - Spring Boot - Framework utilizado para desenvolvimento de serviços com java
-- Spring Cloud Stream - Estrutura do Spring Boot utilizada para comunicação com RabbitMQ.
 - Spotless - Identação de código e remoção de imports não utilizados
 - Swagger - Documentação da API
 - Junit - Testes unitários
