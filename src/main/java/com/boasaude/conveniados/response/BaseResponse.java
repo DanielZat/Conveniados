@@ -5,15 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@Builder
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
-public class AutorizacaoExameResponse {
+@Builder
+public class BaseResponse {
 
-    private Long codigoProcedimento;
+    private int status_code;
 
-    private String situacao;
-
-    private String mensagem;
+    private String message;
 }

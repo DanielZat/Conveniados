@@ -3,13 +3,15 @@ package com.boasaude.conveniados.repository;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Repository;
+
 import com.boasaude.conveniados.entity.AssociadoEntity;
 import com.boasaude.conveniados.entity.PlanoSaudeEntity;
 import com.boasaude.conveniados.entity.ProcedimentoEntity;
 import com.boasaude.conveniados.enums.AbrangenciaEnum;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
