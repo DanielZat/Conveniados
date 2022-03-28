@@ -2,6 +2,8 @@
 
 Microsserviço de conveniados criado para utilização na POC de arquitetura da operadora Boa Saúde - TCC de Arquitetura de dados da PUC Minas Virtual
 
+![Endpoints de conveniados](./pictures/swagger.png "Swagger")
+
 ## Tecnologias utilizadas:
 
 - Java - Linguagem de programação utilizada

@@ -35,19 +35,3 @@ public class AutorizacaoExameController {
         return autorizacaoExameService.autorizarExecucaoExame(autorizacaoExameRequest);
     }
 }
-
-// Autorização de exame - POST
-
-// parametros:
-//
-// - Numero Carteira
-// - Codigo procedimento
-//
-
-// Regra de negócio para autorização de exame/consulta:
-
-// - Buscar usuário
-// - Verificar se usuário é ativo (Ativo considera se está em dia com pagamentos)
-// - Buscar plano de saúde do usuário
-// - Verificar se plano de saúde contempla procedimento
-// - Verificar se usuário já cumpriu carência
