@@ -1,0 +1,8 @@
+logging:
+  level:
+    root: INFO
+    com.boasaude: INFO
+    io.netty.util.internal: INFO
+
+server:
+  port: 9996

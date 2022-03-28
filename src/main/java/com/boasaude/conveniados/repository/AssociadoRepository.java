@@ -11,6 +11,7 @@ import com.boasaude.conveniados.entity.AssociadoEntity;
 import com.boasaude.conveniados.entity.PlanoSaudeEntity;
 import com.boasaude.conveniados.entity.ProcedimentoEntity;
 import com.boasaude.conveniados.enums.AbrangenciaEnum;
+import com.boasaude.conveniados.exception.BadRequestException;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,6 +24,7 @@ public class AssociadoRepository {
 
         return criarListaAssociados()
                 .filter(associadoEntity -> numeroCarteira.equals(associadoEntity.getNumeroCarteira()))
+                .switchIfEmpty(Mono.error(new BadRequestException("Nenhum usuário encontrado para está carteira.")))
                 .single();
     }
 
@@ -79,12 +81,12 @@ public class AssociadoRepository {
                         .build(), AssociadoEntity.builder()
                                 .id("987654")
                                 .ativo(Boolean.TRUE)
-                                .numeroCarteira(5622677723454580L)
+                                .numeroCarteira(2345232225975477L)
                                 .planoSaude(PlanoSaudeEntity.builder()
                                         .id(1)
                                         .nome("Plano Boa Saúde ENFERMARIA")
                                         .abrangenciaEnum(AbrangenciaEnum.ESTADUAL)
-                                        .carencia(90)
+                                        .carencia(180)
                                         .possuiCoparticipacao(Boolean.TRUE)
                                         .valorCoparticipacao(30L)
                                         .procedimentosInclusos(Arrays.asList(ProcedimentoEntity

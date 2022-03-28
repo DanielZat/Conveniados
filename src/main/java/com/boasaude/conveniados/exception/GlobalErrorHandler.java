@@ -9,9 +9,9 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 
+import com.boasaude.conveniados.response.AutorizacaoExameResponse;
 import com.boasaude.conveniados.response.BaseResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,8 +36,15 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
 
         exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-        if (ex instanceof ResponseStatusException) {
-            var cast = (ResponseStatusException) ex;
+        if (ex instanceof AutorizacaoExameException) {
+            var cast = (AutorizacaoExameException) ex;
+            exchange.getResponse().setStatusCode(cast.getStatus());
+            dataBuffer = prepareResponse(bufferFactory, responseFor(cast.getCodigoProcedimento(), cast.getSituacao(), cast.getReason()));
+            return exchange.getResponse().writeWith(Mono.just(dataBuffer));
+        }
+
+        if (ex instanceof BadRequestException) {
+            var cast = (BadRequestException) ex;
             exchange.getResponse().setStatusCode(cast.getStatus());
             dataBuffer = prepareResponse(bufferFactory, responseFor(cast.getReason(), cast.getStatus()));
             return exchange.getResponse().writeWith(Mono.just(dataBuffer));
@@ -57,8 +64,20 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
         }
     }
 
+    private <T> DataBuffer prepareResponse(DataBufferFactory bufferFactory, AutorizacaoExameResponse response) {
+        try {
+            return bufferFactory.wrap(objectMapper.writeValueAsBytes(response));
+        } catch (JsonProcessingException e) {
+            return bufferFactory.wrap("".getBytes());
+        }
+    }
+
     private BaseResponse responseFor(String message, HttpStatus status) {
         return BaseResponse.builder().message(message).status_code(status.value()).build();
+    }
+
+    private AutorizacaoExameResponse responseFor(Long codigoProcedimento, String situacao, String mensagem) {
+        return AutorizacaoExameResponse.builder().codigoProcedimento(codigoProcedimento).situacao(situacao).mensagem(mensagem).build();
     }
 
     private BaseResponse genericResponse() {
