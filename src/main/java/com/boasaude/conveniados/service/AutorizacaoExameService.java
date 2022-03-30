@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.boasaude.conveniados.entity.AssociadoEntity;
 import com.boasaude.conveniados.exception.AutorizacaoExameException;
+import com.boasaude.conveniados.exception.BadRequestException;
 import com.boasaude.conveniados.repository.AssociadoRepository;
 import com.boasaude.conveniados.request.AutorizacaoExameRequest;
 import com.boasaude.conveniados.response.AutorizacaoExameResponse;
@@ -30,14 +31,15 @@ public class AutorizacaoExameService {
     public Mono<AutorizacaoExameResponse> autorizarExecucaoExame(AutorizacaoExameRequest autorizacaoExameRequest) {
 
         return associadoRepository.buscarAssociadoPorCarteira(autorizacaoExameRequest.getNumeroCarteira())
+                .switchIfEmpty(Mono.error(new BadRequestException("Nenhum usuário encontrado para esta carteira.")))
                 .filter(AssociadoEntity::getAtivo)
-                .switchIfEmpty(Mono.error(new AutorizacaoExameException(autorizacaoExameRequest.getCodigoProcedimento(), "Usuário não está ativo")))
+                .switchIfEmpty(Mono.error(new AutorizacaoExameException(autorizacaoExameRequest.getCodigoProcedimento(), "Usuário não está ativo.")))
                 .filter(verificarCarenciaAssociado())
                 .switchIfEmpty(Mono.error(new AutorizacaoExameException(autorizacaoExameRequest.getCodigoProcedimento(),
-                        "Usuário está no período de carência e não pode realizar o procedimento")))
+                        "Usuário está no período de carência e não pode realizar o procedimento.")))
                 .filter(verificarProcedimentoInclusoNoPlano(autorizacaoExameRequest))
                 .switchIfEmpty(Mono.error(new AutorizacaoExameException(autorizacaoExameRequest.getCodigoProcedimento(),
-                        "Procedimento não está incluso no plano")))
+                        "Procedimento não está incluso no plano.")))
                 .map(associadoEntity -> builderAutorizacaoExameResponse(autorizacaoExameRequest
                         .getCodigoProcedimento(), "Autorizado", StringUtils.EMPTY));
     }
