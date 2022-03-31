@@ -25,10 +25,13 @@ public class AutorizacaoExameController {
 
     @PostMapping()
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Autorizado com sucesso", content = @Content(
+            @ApiResponse(responseCode = "200", description = "Autorizado", content = @Content(
                     schema = @Schema(
                             implementation = AutorizacaoExameResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Ocorreu um problema ao verificar autorização para realização do exame")
+            @ApiResponse(responseCode = "404", description = "Nenhum usuário encontrado para esta carteira."),
+            @ApiResponse(responseCode = "400", description = "Usuário não está ativo."),
+            @ApiResponse(responseCode = "400", description = "Usuário está no período de carência e não pode realizar o procedimento."),
+            @ApiResponse(responseCode = "400", description = "Procedimento não está incluso no plano.")
     })
     @ResponseStatus(HttpStatus.OK)
     public Mono<AutorizacaoExameResponse> autorizarExecucaoExame(@RequestBody AutorizacaoExameRequest autorizacaoExameRequest) {

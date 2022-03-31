@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.boasaude.conveniados.entity.AssociadoEntity;
 import com.boasaude.conveniados.exception.AutorizacaoExameException;
-import com.boasaude.conveniados.exception.BadRequestException;
+import com.boasaude.conveniados.exception.NotFoundException;
 import com.boasaude.conveniados.repository.AssociadoRepository;
 import com.boasaude.conveniados.request.AutorizacaoExameRequest;
 import com.boasaude.conveniados.response.AutorizacaoExameResponse;
@@ -31,7 +31,7 @@ public class AutorizacaoExameService {
     public Mono<AutorizacaoExameResponse> autorizarExecucaoExame(AutorizacaoExameRequest autorizacaoExameRequest) {
 
         return associadoRepository.buscarAssociadoPorCarteira(autorizacaoExameRequest.getNumeroCarteira())
-                .switchIfEmpty(Mono.error(new BadRequestException("Nenhum usuário encontrado para esta carteira.")))
+                .switchIfEmpty(Mono.error(new NotFoundException("Nenhum usuário encontrado para esta carteira.")))
                 .filter(AssociadoEntity::getAtivo)
                 .switchIfEmpty(Mono.error(new AutorizacaoExameException(autorizacaoExameRequest.getCodigoProcedimento(), "Usuário não está ativo.")))
                 .filter(verificarCarenciaAssociado())

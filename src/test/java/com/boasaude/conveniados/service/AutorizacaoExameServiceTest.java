@@ -9,16 +9,16 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.boasaude.conveniados.exception.AutorizacaoExameException;
-import com.boasaude.conveniados.exception.BadRequestException;
+import com.boasaude.conveniados.exception.NotFoundException;
 import com.boasaude.conveniados.helper.AssociadoHelper;
 import com.boasaude.conveniados.repository.AssociadoRepository;
 import com.boasaude.conveniados.request.AutorizacaoExameRequest;
 
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {"spring.main.webApplicationType=reactive"})
@@ -53,17 +53,13 @@ public class AutorizacaoExameServiceTest {
 
         var autorizacaoExameRequest = AutorizacaoExameRequest.builder().codigoProcedimento(999999L).numeroCarteira(99999999999999L).build();
 
-        try {
-            when(associadoRepository.buscarAssociadoPorCarteira(autorizacaoExameRequest.getNumeroCarteira()))
-                    .thenReturn(Mono.empty());
+        when(associadoRepository.buscarAssociadoPorCarteira(autorizacaoExameRequest.getNumeroCarteira()))
+                .thenReturn(Mono.empty());
 
-            autorizacaoExameService.autorizarExecucaoExame(autorizacaoExameRequest);
-        } catch (BadRequestException ex) {
-            Assertions.assertNotNull(ex);
-            Assertions.assertTrue(StringUtils.isNotEmpty(ex.getMessage()));
-            Assertions.assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
-            Assertions.assertEquals("Nenhum usuário encontrado para esta carteira.", ex.getReason());
-        }
+        StepVerifier.create(autorizacaoExameService.autorizarExecucaoExame(autorizacaoExameRequest))
+                .expectErrorMatches(ex -> ex instanceof NotFoundException
+                        && ((NotFoundException) ex).getReason().equals("Nenhum usuário encontrado para esta carteira."))
+                .verify();
     }
 
     @Test
@@ -76,14 +72,10 @@ public class AutorizacaoExameServiceTest {
         when(associadoRepository.buscarAssociadoPorCarteira(autorizacaoExameRequest.getNumeroCarteira()))
                 .thenReturn(Mono.just(associadoEntity));
 
-        try {
-            autorizacaoExameService.autorizarExecucaoExame(autorizacaoExameRequest);
-        } catch (AutorizacaoExameException ex) {
-            Assertions.assertNotNull(ex);
-            Assertions.assertTrue(StringUtils.isNotEmpty(ex.getMessage()));
-            Assertions.assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
-            Assertions.assertEquals("Procedimento não está incluso no plano.", ex.getReason());
-        }
+        StepVerifier.create(autorizacaoExameService.autorizarExecucaoExame(autorizacaoExameRequest))
+                .expectErrorMatches(ex -> ex instanceof AutorizacaoExameException
+                        && ((AutorizacaoExameException) ex).getReason().equals("Procedimento não está incluso no plano."))
+                .verify();
     }
 
     @Test
@@ -96,14 +88,10 @@ public class AutorizacaoExameServiceTest {
         when(associadoRepository.buscarAssociadoPorCarteira(autorizacaoExameRequest.getNumeroCarteira()))
                 .thenReturn(Mono.just(associadoEntity));
 
-        try {
-            autorizacaoExameService.autorizarExecucaoExame(autorizacaoExameRequest);
-        } catch (AutorizacaoExameException ex) {
-            Assertions.assertNotNull(ex);
-            Assertions.assertTrue(StringUtils.isNotEmpty(ex.getMessage()));
-            Assertions.assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
-            Assertions.assertEquals("Usuário não está ativo.", ex.getReason());
-        }
+        StepVerifier.create(autorizacaoExameService.autorizarExecucaoExame(autorizacaoExameRequest))
+                .expectErrorMatches(ex -> ex instanceof AutorizacaoExameException
+                        && ((AutorizacaoExameException) ex).getReason().equals("Usuário não está ativo."))
+                .verify();
     }
 
     @Test
@@ -116,13 +104,10 @@ public class AutorizacaoExameServiceTest {
         when(associadoRepository.buscarAssociadoPorCarteira(autorizacaoExameRequest.getNumeroCarteira()))
                 .thenReturn(Mono.just(associadoEntity));
 
-        try {
-            autorizacaoExameService.autorizarExecucaoExame(autorizacaoExameRequest);
-        } catch (AutorizacaoExameException ex) {
-            Assertions.assertNotNull(ex);
-            Assertions.assertTrue(StringUtils.isNotEmpty(ex.getMessage()));
-            Assertions.assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
-            Assertions.assertEquals("Usuário está no período de carência e não pode realizar o procedimento.", ex.getReason());
-        }
+        StepVerifier.create(autorizacaoExameService.autorizarExecucaoExame(autorizacaoExameRequest))
+                .expectErrorMatches(ex -> ex instanceof AutorizacaoExameException
+                        && ((AutorizacaoExameException) ex).getReason()
+                                .equals("Usuário está no período de carência e não pode realizar o procedimento."))
+                .verify();
     }
 }
