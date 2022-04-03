@@ -50,6 +50,13 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
             return exchange.getResponse().writeWith(Mono.just(dataBuffer));
         }
 
+        if (ex instanceof NotFoundException) {
+            var cast = (NotFoundException) ex;
+            exchange.getResponse().setStatusCode(cast.getStatus());
+            dataBuffer = prepareResponse(bufferFactory, responseFor(cast.getReason(), cast.getStatus()));
+            return exchange.getResponse().writeWith(Mono.just(dataBuffer));
+        }
+
         exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
         dataBuffer = prepareResponse(bufferFactory, genericResponse());
 
