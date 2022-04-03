@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.boasaude'
-version = '0.0.1-SNAPSHOT'
+version = 'latest'
 sourceCompatibility = '11'
 
 apply plugin: 'com.diffplug.spotless'
